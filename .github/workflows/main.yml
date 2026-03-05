@@ -27,7 +27,7 @@ jobs:
 
     - name: Run C++ tests with VSTest
       # Use the path found in the previous step
-      run:  vstest.console.exe x64/debug/TEST.dll /Platform:x64 /Logger:trx
+      run:  vstest.console.exe x64/debug/TEST_1.dll /Platform:x64 /Logger:trx
       # The VSTest action marketplace has some issues/deprecations, so manual execution is safer
       shell: cmd
       
