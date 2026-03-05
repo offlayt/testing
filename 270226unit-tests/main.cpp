@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-	Person p = { "Oleg", 28, Person::MALE };
+	Person p("Oleg", 28, Person::MALE);
 
-	cout << p.GetName() << endl;
+cout << p.GetName() << endl;
 }
