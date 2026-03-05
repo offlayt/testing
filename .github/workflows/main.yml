@@ -23,7 +23,7 @@ jobs:
 
     - name: Build Solution
       # Use MSBuild to compile the entire solution, including the test projects
-      run: msbuild example_unit.sln /p:Configuration=Debug /p:Platform=x64
+      run: msbuild 270226unit-tests.sln /p:Configuration=Debug /p:Platform=x64
 
     - name: Run C++ tests with VSTest
       # Use the path found in the previous step
