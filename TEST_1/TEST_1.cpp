@@ -161,3 +161,17 @@ namespace TEST1
 		}
 	};
 };
+
+namespace Microsoft { namespace VisualStudio { namespace CppUnitTestFramework {
+	template<>
+	::std::wstring ToString(const Person::Sex& s)
+	{
+		switch (s)
+		{
+		case Person::UNDEF: return L"UNDEF";
+		case Person::MALE: return L"MALE";
+		case Person::FEMALE: return L"FEMALE";
+		default: return L"UNKNOWN";
+		}
+	}
+}}}
