@@ -46,4 +46,4 @@ jobs:
         files: |
           source.zip
           artifacts/*.dll
-	  artifacts/*.exe
+          artifacts/*.exe
