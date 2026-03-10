@@ -1,8 +1,9 @@
 name: Windows C++ Release
 
 on:
-  push:
-    branches: [main, master]
+  create:
+    tags:
+      - 'v*'
 
 jobs:
   release:
@@ -30,10 +31,8 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        name: Release ${{ github.sha }}
+        name: Release ${{ github.ref_name }}
         draft: false
         prerelease: false
         generate_release_notes: true
         files: source.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
