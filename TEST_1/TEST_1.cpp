@@ -160,25 +160,16 @@ namespace TEST1
 			Assert::AreEqual(Person::MALE, person.GetSex());
 		}
 	};
-}
 
-namespace Microsoft
-{
-	namespace VisualStudio
+	template<>
+	static std::wstring ToString<Person::Sex>(const Person::Sex& s)
 	{
-		namespace CppUnitTestFramework
+		switch (s)
 		{
-			template<>
-			static std::wstring ToString(const Person::Sex& s)
-			{
-				switch (s)
-				{
-				case Person::UNDEF: return L"UNDEF";
-				case Person::MALE: return L"MALE";
-				case Person::FEMALE: return L"FEMALE";
-				default: return L"UNKNOWN";
-				}
-			}
+		case Person::UNDEF: return L"UNDEF";
+		case Person::MALE: return L"MALE";
+		case Person::FEMALE: return L"FEMALE";
+		default: return L"UNKNOWN";
 		}
 	}
-}
+};
