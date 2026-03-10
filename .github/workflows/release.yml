@@ -1,0 +1,39 @@
+name: Windows C++ Release
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup Visual Studio environment
+      uses: ilammy/msvc-dev-cmd@v1.4.1
+      with:
+        arch: x64
+
+    - name: Build Solution (Release)
+      run: msbuild 270226unit-tests.sln /p:Configuration=Release /p:Platform=x64
+
+    - name: Create Source Archive
+      run: |
+        powershell -Command "Compress-Archive -Path * -DestinationPath source.zip -Force"
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Release ${{ github.sha }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: source.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
