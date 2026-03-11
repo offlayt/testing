@@ -22,11 +22,17 @@ jobs:
         arch: x64
 
     - name: Build Solution (Release)
-      run: msbuild 270226unit-tests.sln /p:Configuration=Release /p:Platform=x64
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Path logs -Force | Out-Null
+        msbuild 270226unit-tests.sln /p:Configuration=Release /p:Platform=x64 2>&1 | Tee-Object -FilePath logs/build-release.log
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     - name: Create Source Archive
+      shell: pwsh
       run: |
-        powershell -Command "Compress-Archive -Path * -DestinationPath source.zip -Force"
+        Compress-Archive -Path * -DestinationPath source.zip -Force 2>&1 | Tee-Object -FilePath logs/archive.log
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
@@ -36,3 +42,11 @@ jobs:
         prerelease: false
         generate_release_notes: true
         files: source.zip
+
+    - name: Upload release logs artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-logs
+        path: logs/
+        if-no-files-found: warn

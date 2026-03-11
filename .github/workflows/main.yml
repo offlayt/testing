@@ -23,16 +23,26 @@ jobs:
 
     - name: Build Solution
       # Use MSBuild to compile the entire solution, including the test projects
-      run: msbuild 270226unit-tests.sln /p:Configuration=Debug /p:Platform=x64
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Path logs -Force | Out-Null
+        msbuild 270226unit-tests.sln /p:Configuration=Debug /p:Platform=x64 2>&1 | Tee-Object -FilePath logs/build.log
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     - name: Run C++ tests with VSTest
       # Use the path found in the previous step
-      run:  vstest.console.exe x64/debug/TEST_1.dll /Platform:x64 /Logger:trx
+      shell: pwsh
+      run: |
+        vstest.console.exe x64/debug/TEST_1.dll /Platform:x64 /Logger:trx /ResultsDirectory:TestResults 2>&1 | Tee-Object -FilePath logs/test.log
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       # The VSTest action marketplace has some issues/deprecations, so manual execution is safer
-      shell: cmd
-      
-    - name: Upload test results artifact (optional)
+
+    - name: Upload logs and test artifacts
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-results
-        path: 'tests/latest.trx' # Upload the .trx results file
+        name: ci-logs-and-results
+        path: |
+          logs/
+          TestResults/
+        if-no-files-found: warn
