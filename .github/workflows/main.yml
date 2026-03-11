@@ -4,7 +4,6 @@ on: [pull_request]
 
 jobs:
   build-and-test:
-    # Use a Windows runner as the tests depend on the Visual Studio environment
     runs-on: windows-latest
 
     steps:
@@ -15,34 +14,18 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Setup Visual Studio environment
-      # This action sets up the necessary environment variables for MSVC build tools
       uses: ilammy/msvc-dev-cmd@v1.4.1
-      # You can specify the architecture, e.g., 'x64' or 'x86'
       with:
         arch: x64
 
     - name: Build Solution
-      # Use MSBuild to compile the entire solution, including the test projects
-      shell: pwsh
-      run: |
-        New-Item -ItemType Directory -Path logs -Force | Out-Null
-        msbuild 270226unit-tests.sln /p:Configuration=Debug /p:Platform=x64 2>&1 | Tee-Object -FilePath logs/build.log
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      run: msbuild 270226unit-tests.sln /p:Configuration=Debug /p:Platform=x64
 
     - name: Run C++ tests with VSTest
-      # Use the path found in the previous step
-      shell: pwsh
-      run: |
-        vstest.console.exe x64/debug/TEST_1.dll /Platform:x64 /Logger:trx /ResultsDirectory:TestResults 2>&1 | Tee-Object -FilePath logs/test.log
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      # The VSTest action marketplace has some issues/deprecations, so manual execution is safer
+      run: vstest.console.exe x64/debug/TEST_1.dll /Platform:x64 /Logger:trx /ResultsDirectory:TestResults
 
-    - name: Upload logs and test artifacts
-      if: always()
+    - name: Upload test artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ci-logs-and-results
-        path: |
-          logs/
-          TestResults/
-        if-no-files-found: warn
+        name: ci-test-results
+        path: TestResults/
